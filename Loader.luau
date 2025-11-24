@@ -1,5 +1,5 @@
 local GH_REPO_OWNER = "pubmain"
-local GH_REPO = "sniper-bin"
+local GH_REPO = "bin"
 
 local http_service = game:GetService("HttpService")
 local players = game:GetService("Players")
@@ -23,7 +23,7 @@ local function get_files(): { File }
 	local json = game:HttpGet(URL)
 	local files = http_service:JSONDecode(json) :: { File }
 	for index, file in files do
-		if file.name:find("Loader") or file.name == "README.md" then
+		if file.name:find("Loader") or file.name == "README.md" or not file.name:find("%.lua") then
 			table.remove(files, index)
 		end
 	end
@@ -52,7 +52,7 @@ if not success then
 	return
 end
 loader:CreateDivider()
-if #files ~= 0 then
+if #files == 0 then
 	loader:CreateLabel("no scripts found")
 end
 for _, file in files do
