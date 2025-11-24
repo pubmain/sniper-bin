@@ -23,7 +23,7 @@ local function get_files(): { File }
 	local json = game:HttpGet(URL)
 	local files = http_service:JSONDecode(json) :: { File }
 	for index, file in files do
-		if file.name:find("Loader") then
+		if file.name:find("Loader") or file.name == "README.md" then
 			table.remove(files, index)
 		end
 	end
@@ -56,7 +56,12 @@ if #files ~= 0 then
 	loader:CreateLabel("no scripts found")
 end
 for _, file in files do
-	file.name = file.name:gsub("%.luau", ""):gsub("%.lua", "")
+	local new_name = file.name:gsub("%.luau", ""):gsub("%.lua", "")
+	-- nice check
+	if file.name == new_name then
+		continue
+	end
+	file.name = new_name
 	loader:CreateButton(file.name, function()
 		window:Notify("Sniper", `loading {file.name}`)
 		local success, data = pcall(function()
