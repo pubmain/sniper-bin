@@ -1,5 +1,5 @@
 local GH_REPO_OWNER = "pubmain"
-local GH_REPO = "bin"
+local GH_REPO = "sniper-bin"
 
 local http_service = game:GetService("HttpService")
 local players = game:GetService("Players")
