@@ -66,6 +66,7 @@ if not success then
 	return
 end
 local file_map = {}
+table.remove(files, 1)
 for index, file in files do
 	local new_name = file.name:gsub("%.luau", ""):gsub("%.lua", "")
 	-- nice check
