@@ -1,5 +1,6 @@
 local GH_REPO_OWNER = "pubmain"
 local GH_REPO = "sniper-bin"
+local DISCORD_INVITE = "discord.gg/tH42ChWwCp"
 
 local http_service = game:GetService("HttpService")
 local players = game:GetService("Players")
@@ -12,6 +13,16 @@ do
 		return local_player:Kick(`failed to load AnkaUi\n{err}`)
 	end
 	library = callback()
+end
+
+if (getthreadidentity or getthreadcontext or getidentity)() ~= 8 or not setclipboard then
+	task.delay(20, function()
+		library:Destroy()
+	end)
+	return library:Notify(
+		"Sniper",
+		`unsupported executor, join our discord server [{DISCORD_INVITE}] to get recommended executors`
+	)
 end
 
 type File = {
@@ -48,7 +59,7 @@ local script_info: Section?
 local load_script: Button?
 
 loader:CreateButton("join discord server", function()
-	setclipboard("https://discord.gg/tH42ChWwCp")
+	setclipboard(DISCORD_INVITE)
 	window:Notify("Sniper", "copied discord server link")
 end)
 loader:CreateButton("unload", function()
@@ -120,7 +131,7 @@ else
 			window:Toggle(false)
 			task.wait(5)
 			success, err = pcall(function(...)
-				library:Destroy()
+				window:Destroy()
 			end)
 			if not success then
 				library:Notify("Sniper", "failed to unload loader")
