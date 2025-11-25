@@ -34,7 +34,6 @@ end
 local function get_update(path: string): { [string]: any }
 	local URL = `https://api.github.com/repos/{GH_REPO_OWNER}/{GH_REPO}/commits?path={path}&per_page=1`
 	local json = game:HttpGet(URL)
-	setclipboard(json)
 	return http_service:JSONDecode(json)[1]
 end
 
