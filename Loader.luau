@@ -15,16 +15,6 @@ do
 	library = callback()
 end
 
-if (getthreadidentity or getthreadcontext or getidentity)() ~= 8 or not setclipboard then
-	task.delay(20, function()
-		library:Destroy()
-	end)
-	return library:Notify(
-		"Sniper",
-		`unsupported executor, join our discord server [{DISCORD_INVITE}] to get recommended executors`
-	)
-end
-
 type File = {
 	name: string,
 	path: string,
@@ -64,8 +54,12 @@ local script_info: Section?
 local load_script: Button?
 
 loader:CreateButton("join discord server", function()
-	setclipboard(DISCORD_INVITE)
-	window:Notify("Sniper", "copied discord server link")
+	if setclipboard then
+		setclipboard(DISCORD_INVITE)
+		window:Notify("Sniper", "copied discord server link")
+	else
+		window:Notify("Sniper", `executor doesnt support setclipboard, join our discord server at {DISCORD_INVITE}`)
+	end
 end)
 
 loader:CreateButton("unload", function()
@@ -184,4 +178,3 @@ else
 		return
 	end)
 end
--- workflow test
