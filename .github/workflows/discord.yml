@@ -1,0 +1,48 @@
+name: Discord
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  discord:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const files = (await github.rest.repos.getContent({
+                owner: "pubmain",
+                repo: "sniper-bin",
+                path: ""
+            })).data
+            let description = ""
+            files.forEach((file, i) => {
+                if (!file.name.endsWith(".luau") || file.name.includes("Loader")) {
+                    return;
+                }
+                file.name = file.name.replace(".luau", "")
+                description += `${file.name}\n`
+            })
+            await fetch({
+                url: "https://discord.com/api/webhooks/${{ SECRETS.WEBHOOK_ID }}/${{ SECRETS.WEBHOOK_TOKEN }}/messages/${{ SECRETS.MESSAGE_ID }}",
+                method: "PATCH",
+                body: { 
+                    "embeds": [
+                        { 
+                            "title": "Supported games", "color": 2565413,
+                            "description": description,
+                            "fields": [
+                                { "name": "Upcoming games", "value": "Deadly Delivery" }
+                            ]
+                        }
+                    ],
+                    "components": [],
+                    "username": "Sniper Hub"
+                },
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
