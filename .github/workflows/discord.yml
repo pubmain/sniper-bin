@@ -11,6 +11,10 @@ jobs:
 
     steps:
       - uses: actions/github-script@v8
+        env:
+          WEBHOOK_ID: ${{ SECRETS.WEBHOOK_ID }}
+          WEBHOOK_TOKEN: ${{ SECRETS.WEBHOOK_TOKEN }}
+          MESSAGE_ID: ${{ SECRETS.MESSAGE_ID }}
         with:
           script: |
             const files = (await github.rest.repos.getContent({
@@ -27,7 +31,7 @@ jobs:
                 description += `${file.name}\n`
             })
             await fetch({
-                url: "https://discord.com/api/webhooks/${{ SECRETS.WEBHOOK_ID }}/${{ SECRETS.WEBHOOK_TOKEN }}/messages/${{ SECRETS.MESSAGE_ID }}",
+                url: "https://discord.com/api/webhooks/${process.env.WEBHOOK_ID}/${process.env.WEBHOOK_TOKEN}/messages/${process.env.MESSAGE_ID}",
                 method: "PATCH",
                 body: { 
                     "embeds": [
