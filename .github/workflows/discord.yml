@@ -32,20 +32,23 @@ jobs:
             })
             await fetch("https://discord.com/api/webhooks/${process.env.WEBHOOK_ID}/${process.env.WEBHOOK_TOKEN}/messages/${process.env.MESSAGE_ID}", {
                 method: "PATCH",
-                body: { 
+                body: JSON.stringify({
+                    content: "",
                     "embeds": [
-                        { 
+                        {
                             "title": "Supported games", "color": 2565413,
                             "description": description,
                             "fields": [
-                                { "name": "Upcoming games", "value": "Deadly Delivery" }
+                                { "name": "Upcoming games", "value": "Deadly Delivery (soon)" }
                             ]
                         }
                     ],
-                    "components": [],
-                    "username": "Sniper Hub"
-                },
+                }),
                 headers: {
                     "Content-Type": "application/json"
                 }
             })
+            if (!response.ok) {
+                console.log(await response.json())
+                throw new Error(`request failed: ${await response.text()}`);
+            }
