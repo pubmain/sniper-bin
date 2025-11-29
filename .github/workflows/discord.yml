@@ -30,7 +30,7 @@ jobs:
                 file.name = file.name.replace(".luau", "")
                 description += `${file.name}\n`
             })
-            await fetch("https://discord.com/api/webhooks/${process.env.WEBHOOK_ID}/${process.env.WEBHOOK_TOKEN}/messages/${process.env.MESSAGE_ID}", {
+            const response = await fetch("https://discord.com/api/webhooks/${process.env.WEBHOOK_ID}/${process.env.WEBHOOK_TOKEN}/messages/${process.env.MESSAGE_ID}", {
                 method: "PATCH",
                 body: JSON.stringify({
                     content: "",
