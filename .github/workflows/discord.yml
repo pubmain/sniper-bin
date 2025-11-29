@@ -49,6 +49,5 @@ jobs:
                 }
             })
             if (!response.ok) {
-                console.log(await response.json())
                 throw new Error(`request failed: ${await response.text()}`);
             }
