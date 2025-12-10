@@ -15,6 +15,11 @@ do
 	library = callback()
 end
 
+local executor = identifyexecutor()
+if executor == "Solara" or executor == "Xeno" then
+	return library:Notify("Sniper Hub", `Executor not supported, join our discord server [{DISCORD_INVITE}] to get supported executor list`, 15)
+end
+
 type File = {
 	name: string,
 	path: string,
