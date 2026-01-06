@@ -117,22 +117,11 @@ else
 
 			local callback, err = loadstring(data, `Sniper`)
 			if not callback then
-				err = err:gsub(".+:%d+: ", "")
-				local InvalidCharPos = #err
-				for i = 1, #err do
-					local Character = err:byte(i, i)
-					if Character < 32 or Character > 126 then
-						InvalidCharPos = i - 1
-						break
-					end
-				end
-				err = err:sub(1, InvalidCharPos)
 				return window:Notify("Sniper", `failed to load script\n{err}`)
 			end
 
 			success, err = pcall(callback)
 			if not success then
-				err = err:gsub(".+:%d+: ", "")
 				return window:Notify("Sniper", `failed to run script\n{err}`)
 			end
 
