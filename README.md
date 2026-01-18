@@ -1,3 +1,7 @@
+# Sniper Hub
+## Join our [discord server](https://discord.com/invite/tH42ChWwCp)
+Best script for Lone Survival and The Lost Front.
+
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/pubmain/sniper-bin/main/Loader.luau"))()
+loadstring(game:HttpGet("https://github.com/pubmain/sniper-bin/raw/main/Loader.luau"))()
 ```
