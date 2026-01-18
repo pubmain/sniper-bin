@@ -39,7 +39,7 @@ jobs:
                             "title": "Supported games", "color": 2565413,
                             "description": description,
                             "fields": [
-                                { "name": "Upcoming games", "value": "Deadly Delivery (soon)" }
+                                // { "name": "Upcoming games", "value": "Deadly Delivery (soon)" }
                             ]
                         }
                     ],
