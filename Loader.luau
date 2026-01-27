@@ -67,13 +67,15 @@ local loader = main:CreateSection(`Loader`)
 local script_info: Section?
 local load_script: Button?
 
-local discord_text_box = loader:CreateTextBox(`Join Sniper Hub Discord Server!`, ``, false, function() end)
-discord_text_box:ToggleInput()
-discord_text_box:SetValue(DISCORD_INVITE)
+loader:CreateLabel(`Join Sniper Hub Discord Server!`)
+loader:CreateButton(DISCORD_INVITE, function()
+	setclipboard(DISCORD_INVITE)
+	library:Notify(`Sniper Hub`, `Copied discord invite link`)
+end)
 
 loader:CreateButton(`Exit Loader`, function()
 	local success, error = pcall(function(...)
-		library:Destroy()
+		window:Destroy()
 	end)
 	if not success then
 		library:Notify(`Sniper Hub`, `Failed to unload loader. {error}`)
