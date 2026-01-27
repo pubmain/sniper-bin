@@ -1,14 +1,17 @@
-local GH_REPO_OWNER = "pubmain"
-local GH_REPO = "sniper-bin"
-local DISCORD_INVITE = "discord.gg/tH42ChWwCp"
+local GH_REPO_OWNER = `pubmain`
+local GH_REPO = `sniper-bin`
+local DISCORD_INVITE = `discord.gg/tH42ChWwCp`
+local SCRIPT_TIMEOUT = 5
 
-local http_service = game:GetService("HttpService")
-local players = game:GetService("Players")
+local user_input_service = game:GetService(`UserInputService`)
+local http_service = game:GetService(`HttpService`)
+local players = game:GetService(`Players`)
 local local_player = players.LocalPlayer
 local library: AnkaUi = nil
+
 do
 	local callback, err =
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/nfpw/XXSCRIPT/main/Library/Module.lua"), "AnkaUi")
+		loadstring(game:HttpGet(`https://raw.githubusercontent.com/nfpw/XXSCRIPT/main/Library/Module.lua`), `AnkaUi`)
 	if not callback then
 		return local_player:Kick(`failed to load AnkaUi\n{err}`)
 	end
@@ -16,8 +19,12 @@ do
 end
 
 local executor = identifyexecutor()
-if executor == "Solara" or executor == "Xeno" then
-	return library:Notify("Sniper Hub", `Executor not supported, join our discord server [{DISCORD_INVITE}] to get supported executor list`, 15)
+if executor == `Solara` or executor == `Xeno` then
+	return library:Notify(
+		`Sniper Hub`,
+		`Executor not supported, join our discord server [{DISCORD_INVITE}] to get supported executor list`,
+		15
+	)
 end
 
 type File = {
@@ -32,9 +39,9 @@ local function get_files(): { File }
 	local files = http_service:JSONDecode(json) :: { File }
 	local out = {}
 	for _, f in ipairs(files) do
-		if f.type == "file" then
+		if f.type == `file` then
 			local name = f.name
-			if not name:find("Loader") and name ~= "README.md" and name:find("%.lua") then
+			if not name:find(`Loader`) and name ~= `README.md` and name:find(`%.lua`) then
 				table.insert(out, f)
 			end
 		end
@@ -50,36 +57,32 @@ local function get_update(path: string): { [string]: any }
 end
 
 local window = library:CreateWindow({
-	WindowName = "Sniper Hub",
+	Color = Color3.fromRGB(128, 128, 128),
+	Keybind = Enum.KeyCode.End,
+	WindowName = `Sniper Hub | Loader`,
 }, gethui())
 
-local main = window:CreateTab("main")
-local loader = main:CreateSection("loader")
+local main = window:CreateTab(`Sniper Hub`)
+local loader = main:CreateSection(`Loader`)
 local script_info: Section?
 local load_script: Button?
 
-loader:CreateButton("join discord server", function()
-	if setclipboard then
-		setclipboard(DISCORD_INVITE)
-		window:Notify("Sniper", "copied discord server link")
-	else
-		window:Notify("Sniper", `executor doesnt support setclipboard, join our discord server at {DISCORD_INVITE}`)
-	end
-end)
+local discord_text_box = loader:CreateTextBox(`Join Sniper Hub Discord Server!`, ``, false, function() end)
+discord_text_box:ToggleInput()
+discord_text_box:SetValue(DISCORD_INVITE)
 
-loader:CreateButton("unload", function()
+loader:CreateButton(`Exit Loader`, function()
 	local success, error = pcall(function(...)
 		library:Destroy()
 	end)
 	if not success then
-		library:Notify("Sniper", "failed to unload loader")
-		warn("failed to unload loader", error)
+		library:Notify(`Sniper Hub`, `Failed to unload loader. {error}`)
 	end
 end)
 
 local success, files = pcall(get_files)
 if not success then
-	window:Notify("Sniper", `failed to fetch scripts\n{files}`)
+	loader:CreateLabel(`Failed to fetch scripts`)
 	return
 end
 
@@ -87,7 +90,7 @@ local file_map = {}
 local new_files = {}
 
 for _, file in ipairs(files) do
-	local clean = file.name:gsub("%.luau", ""):gsub("%.lua", "")
+	local clean = file.name:gsub(`%.luau`, ``):gsub(`%.lua`, ``)
 	if clean ~= file.name then
 		file_map[clean] = file
 		file.name = clean
@@ -98,34 +101,53 @@ end
 files = new_files
 
 if #files == 0 then
-	loader:CreateLabel("no scripts found")
+	loader:CreateLabel(`No scripts found`)
 else
-	loader:CreateDropdown("games", files, function(selected_file: string)
+	loader:CreateDropdown(`Scripts`, files, function(selected_file: string)
 		local file = file_map[selected_file]
 		if load_script then
 			load_script:Destroy()
 		end
 
-		load_script = loader:CreateButton("load", function()
-			window:Notify("Sniper", `loading {file.name}`)
+		load_script = loader:CreateButton(`Load Script`, function()
+			library:Notify(`Sniper Hub`, `Loading {file.name}`)
 			local success, data = pcall(function()
 				return game:HttpGet(file.download_url)
 			end)
 			if not success then
-				return window:Notify("Sniper", `failed to get file\n{data}`)
+				return library:Notify(`Sniper Hub`, `Failed to download script. {data}`)
 			end
+
+			local ib_obfuscated = data:find(`ironbrew1`) ~= nil
 
 			local callback, err = loadstring(data, `Sniper`)
 			if not callback then
-				return window:Notify("Sniper", `failed to load script\n{err}`)
+				return library:Notify(`Sniper Hub`, `Failed to load script. {err}`)
 			end
+
+			-- bit lib fix
+			if ib_obfuscated then
+				if user_input_service:GetPlatform() == Enum.Platform.OSX then
+					local fenv = getfenv(callback)
+					fenv.bit = nil
+					fenv.bit32 = nil
+				end
+			end
+
+			local timeout_thread = task.delay(SCRIPT_TIMEOUT, function()
+				library:Notify(
+					`Sniper Hub`,
+					`Failed to load script after {SCRIPT_TIMEOUT} seconds.\nAre you in the right place?`
+				)
+			end)
 
 			success, err = pcall(callback)
 			if not success then
-				return window:Notify("Sniper", `failed to run script\n{err}`)
+				return library:Notify(`Sniper Hub`, `Failed to execute script. {err}`)
 			end
+			pcall(task.cancel, timeout_thread)
 
-			window:Notify("Sniper", `succesfully loaded {file.name}`)
+			library:Notify(`Sniper Hub`, `Succesfully loaded {file.name}`)
 			window:Toggle(false)
 			task.wait(5)
 
@@ -133,25 +155,28 @@ else
 				window:Destroy()
 			end)
 			if not success then
-				library:Notify("Sniper", "failed to unload loader")
-				warn("failed to unload loader", err)
+				library:Notify(`Sniper Hub`, `Failed to unload loader`)
 			end
 			return
 		end)
 
 		local update = get_update(file.path)
 		if not update then
-			return window:Notify("Sniper", "failed to fetch commit information")
+			return library:Notify(`Sniper Hub`, `Failed to fetch script info`)
 		end
 
 		if script_info then
 			script_info:Destroy()
 		end
 
-		script_info = main:CreateSection("info")
+		script_info = main:CreateSection(`Script info`)
+		-- lsp tuff!
+		if not script_info then
+			return
+		end
 
 		local last_updated_at = script_info:CreateTextBox(
-			"last updated at",
+			`Updated at`,
 			update.commit.author.date,
 			false,
 			function() end,
@@ -161,7 +186,7 @@ else
 		last_updated_at:ToggleInput()
 
 		local updated_by = script_info:CreateTextBox(
-			"updated by",
+			`Updated by`,
 			update.commit.author.name,
 			false,
 			function() end,
@@ -172,4 +197,3 @@ else
 		return
 	end)
 end
---
