@@ -118,7 +118,7 @@ else
 
 			local ib_obfuscated = data:find(`ironbrew1`) ~= nil
 
-			local callback, err = loadstring(data, `Sniper`)
+			local callback, err = loadstring(data, `=Sniper`)
 			if not callback then
 				return library:Notify(`Sniper Hub`, `Failed to load script. {err}`)
 			end
