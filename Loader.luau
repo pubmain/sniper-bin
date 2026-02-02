@@ -11,7 +11,7 @@ local library: AnkaUi = nil
 
 do
 	local callback, err =
-		loadstring(game:HttpGet(`https://raw.githubusercontent.com/nfpw/XXSCRIPT/main/Library/Module.lua`), `AnkaUi`)
+		loadstring(game:HttpGet(`https://raw.githubusercontent.com/nfpw/XXSCRIPT/main/Library/Module.lua`), `=Anka`)
 	if not callback then
 		return local_player:Kick(`failed to load AnkaUi\n{err}`)
 	end
