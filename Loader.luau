@@ -111,14 +111,19 @@ LoaderSection:CreateDropdown(`Scripts`, FileNames, function(SelectedFile: string
 
 		local IronBrewObfuscated = Script:find(`ironbrew1`) ~= nil
 
-		local Callback, CompilationError = loadstring(Script, `=Sniper{File.Name}`)
+		local Callback, CompilationError = loadstring(Script, `=Sniper`)
 		if not Callback then
 			return Library:Notify(`Sniper Hub`, `Failed to load script. {CompilationError}`)
 		end
 		
 		if IronBrewObfuscated then
 			-- vm compression temporary fix
-			getfenv(Callback).load = loadstring
+			local OriginalLoadstring = loadstring
+			local Loadstring = newcclosure(function(source, chunkname)
+				return OriginalLoadstring(source, chunkname or `=Sniper`)
+			end)
+			getfenv(Callback).load = Loadstring
+			getfenv(Callback).loadstring = Loadstring
 			-- bit lib fix
 			if UserInputService:GetPlatform() == Enum.Platform.OSX then
 				local fenv = getfenv(Callback)
