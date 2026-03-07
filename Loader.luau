@@ -119,7 +119,7 @@ LoaderSection:CreateDropdown(`Scripts`, FileNames, function(SelectedFile: string
 		if IronBrewObfuscated then
 			-- vm compression temporary fix
 			local OriginalLoadstring = loadstring
-			local Loadstring = newcclosure(function(source, chunkname)
+			local Loadstring = newcclosure(function(source: string, chunkname: string?)
 				return OriginalLoadstring(source, chunkname or `=Sniper`)
 			end)
 			getfenv(Callback).load = Loadstring
@@ -130,6 +130,16 @@ LoaderSection:CreateDropdown(`Scripts`, FileNames, function(SelectedFile: string
 				fenv.bit = nil
 				fenv.bit32 = nil
 			end
+		end
+
+		if identifyexecutor() == "Velocity" then
+			local OriginalMakefolder = makefolder
+			getfenv(Callback).makefolder = newcclosure(function(Path: string)
+				if isfolder(Path) then
+					return
+				end
+				return OriginalMakefolder(Path)
+			end)
 		end
 
 		local ScriptTimeoutThread = task.delay(SCRIPT_TIMEOUT, function()
