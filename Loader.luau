@@ -126,9 +126,8 @@ LoaderSection:CreateDropdown(`Scripts`, FileNames, function(SelectedFile: string
 			getfenv(Callback).loadstring = Loadstring
 			-- bit lib fix
 			if UserInputService:GetPlatform() == Enum.Platform.OSX then
-				local fenv = getfenv(Callback)
-				fenv.bit = nil
-				fenv.bit32 = nil
+				getfenv(Callback).bit = nil
+				getfenv(Callback).bit32 = nil
 			end
 		end
 
